@@ -144,17 +144,22 @@ export default function WeightLog() {
               className="w-full rounded-md border px-3 py-2 text-sm"
             />
           </div>
-          <div className="flex gap-2">
-            <input
-              required
-              type="number"
-              min="0"
-              step="any"
-              placeholder="kg"
-              value={weight}
-              onChange={(e) => setWeight(e.target.value)}
-              className="w-24 rounded-md border px-3 py-2 text-sm"
-            />
+          <div className="flex gap-2 items-end">
+            <div>
+              <label className="block text-xs font-medium text-slate-500 mb-1">Weight</label>
+              <div className="flex gap-1 items-center">
+                <input
+                  required
+                  type="number"
+                  min="0"
+                  step="any"
+                  value={weight}
+                  onChange={(e) => setWeight(e.target.value)}
+                  className="w-20 rounded-md border px-3 py-2 text-sm"
+                />
+                <span className="text-sm text-slate-600">kg</span>
+              </div>
+            </div>
             <input
               type="text"
               placeholder="Note (optional)"

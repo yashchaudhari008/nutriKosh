@@ -61,45 +61,34 @@ export default function Dashboard() {
           </button>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div className="aspect-square rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 p-6 shadow-md flex flex-col items-center justify-center text-white">
-            <p className="text-sm opacity-75 mb-2">Protein</p>
-            <div className="relative w-24 h-24 flex items-center justify-center mb-4">
-              <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                <circle
-                  cx="50"
-                  cy="50"
-                  r="45"
-                  fill="none"
-                  stroke="rgba(255,255,255,0.1)"
-                  strokeWidth="6"
-                />
-                <circle
-                  cx="50"
-                  cy="50"
-                  r="45"
-                  fill="none"
-                  stroke="white"
-                  strokeWidth="6"
-                  strokeDasharray={`${2 * Math.PI * 45 * (proteinPct / 100)} ${2 * Math.PI * 45}`}
-                  strokeLinecap="round"
-                />
-              </svg>
-              <div className="absolute text-center">
-                <p className="text-2xl font-bold">{totalProtein}</p>
-                <p className="text-xs opacity-75">/ {proteinGoal || "—"}</p>
-              </div>
+        <div className="grid grid-cols-2 gap-4 max-w-md">
+          <div className="rounded-xl bg-slate-900 text-white p-4 shadow-sm flex flex-col justify-between">
+            <div>
+              <p className="text-xs opacity-70 mb-2">Protein</p>
+              <p className="text-3xl font-bold">{totalProtein}g</p>
+              <p className="text-xs opacity-60 mt-1">of {proteinGoal || "—"}g</p>
             </div>
-            <p className="text-xs opacity-75">{totalCalories} kcal</p>
+            <div className="mt-3">
+              <div className="h-1.5 bg-white bg-opacity-20 rounded-full overflow-hidden">
+                <div className="h-full bg-white" style={{ width: `${proteinPct}%` }} />
+              </div>
+              <p className="text-[11px] opacity-60 mt-2">{totalCalories} kcal</p>
+            </div>
           </div>
 
-          <div className="aspect-square rounded-2xl bg-white border border-slate-200 shadow-md p-6 flex flex-col items-center justify-center">
-            <div className="w-full flex items-center justify-between mb-4">
-              <p className="text-xs font-semibold text-slate-600">Weight</p>
+          <div className="rounded-xl bg-white border border-slate-200 p-4 shadow-sm flex flex-col justify-between">
+            <div className="flex items-start justify-between mb-3">
+              <div>
+                <p className="text-xs text-slate-500 mb-1">Weight</p>
+                <p className="text-2xl font-bold text-slate-900">
+                  {weightEntries.length > 0 ? weightEntries[weightEntries.length - 1].weight : "—"}
+                </p>
+                <p className="text-xs text-slate-400">kg</p>
+              </div>
               <div className="flex gap-1">
                 <button
                   onClick={() => setWeightRange("week")}
-                  className={`px-2 py-1 text-xs font-medium rounded transition ${
+                  className={`px-2 py-0.5 text-xs rounded font-medium transition ${
                     weightRange === "week"
                       ? "bg-slate-900 text-white"
                       : "bg-slate-100 text-slate-600 hover:bg-slate-200"
@@ -109,7 +98,7 @@ export default function Dashboard() {
                 </button>
                 <button
                   onClick={() => setWeightRange("month")}
-                  className={`px-2 py-1 text-xs font-medium rounded transition ${
+                  className={`px-2 py-0.5 text-xs rounded font-medium transition ${
                     weightRange === "month"
                       ? "bg-slate-900 text-white"
                       : "bg-slate-100 text-slate-600 hover:bg-slate-200"
@@ -119,20 +108,16 @@ export default function Dashboard() {
                 </button>
               </div>
             </div>
-            <p className="text-4xl font-bold text-slate-900 mb-1">
-              {weightEntries.length > 0 ? weightEntries[weightEntries.length - 1].weight : "—"}
-            </p>
-            <p className="text-sm text-slate-400 mb-3">kg</p>
             {weightEntries.length > 1 && (() => {
               const first = weightEntries[0].weight;
               const last = weightEntries[weightEntries.length - 1].weight;
               return (
                 <>
-                  <div className="w-full mt-4 flex justify-between text-xs text-slate-400 px-1 mb-1">
+                  <div className="w-full flex justify-between text-[10px] text-slate-400 mb-1">
                     <span>{first.toFixed(1)}</span>
                     <span>{last.toFixed(1)}</span>
                   </div>
-                  <div className="w-full h-10">
+                  <div className="w-full h-6">
                     <ResponsiveContainer width="100%" height="100%">
                       <LineChart data={weightEntries} margin={{ top: 0, right: 5, left: 5, bottom: 0 }}>
                         <Tooltip

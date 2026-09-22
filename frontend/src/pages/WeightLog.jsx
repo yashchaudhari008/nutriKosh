@@ -7,7 +7,7 @@ import { addWeightEntry, getWeightEntries } from "../lib/db";
 import { pullServerDataAndMerge } from "../lib/syncEngine";
 
 export default function WeightLog() {
-  const { token } = useAuth();
+  const { user, token } = useAuth();
   const [entries, setEntries] = useState([]);
   const [weight, setWeight] = useState("");
   const [date, setDate] = useState(todayISO());

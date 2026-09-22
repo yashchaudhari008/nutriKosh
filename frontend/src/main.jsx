@@ -8,16 +8,29 @@ import { AuthProvider } from "./hooks/useAuth";
 import { SyncProvider } from "./hooks/useSync";
 import "./index.css";
 
-ReactDOM.createRoot(document.getElementById("root")).render(
+const SKIP_AUTH = import.meta.env.VITE_SKIP_AUTH === "true";
+const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+
+const AppWrapper = () => (
+  <HashRouter>
+    <AuthProvider>
+      <SyncProvider>
+        <App />
+      </SyncProvider>
+    </AuthProvider>
+  </HashRouter>
+);
+
+const root = SKIP_AUTH ? (
   <React.StrictMode>
-    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
-      <HashRouter>
-        <AuthProvider>
-          <SyncProvider>
-            <App />
-          </SyncProvider>
-        </AuthProvider>
-      </HashRouter>
+    <AppWrapper />
+  </React.StrictMode>
+) : (
+  <React.StrictMode>
+    <GoogleOAuthProvider clientId={clientId}>
+      <AppWrapper />
     </GoogleOAuthProvider>
   </React.StrictMode>
 );
+
+ReactDOM.createRoot(document.getElementById("root")).render(root);

@@ -4,6 +4,8 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import AddFood from "./pages/AddFood";
 import WeightLog from "./pages/WeightLog";
+import FoodHistory from "./pages/FoodHistory";
+import WeightInsights from "./pages/WeightInsights";
 import AdminFoods from "./pages/AdminFoods";
 
 function ProtectedRoute({ children }) {
@@ -38,6 +40,22 @@ export default function App() {
         element={
           <ProtectedRoute>
             <WeightLog />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/history/food"
+        element={
+          <ProtectedRoute>
+            <FoodHistory />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/insights/weight"
+        element={
+          <ProtectedRoute>
+            <WeightInsights />
           </ProtectedRoute>
         }
       />

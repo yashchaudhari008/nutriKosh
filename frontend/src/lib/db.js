@@ -78,3 +78,58 @@ export async function clearUserData(userId) {
   await db.foodEntries.where("userId").equals(userId).delete();
   await db.weightEntries.where("userId").equals(userId).delete();
 }
+
+export async function getFoodEntriesByDate(userId, date) {
+  return db.foodEntries.where({ userId, date }).toArray();
+}
+
+export async function getWeightEntriesByDateRange(userId, startDate, endDate) {
+  return db.weightEntries
+    .where("userId")
+    .equals(userId)
+    .filter((e) => e.date >= startDate && e.date <= endDate)
+    .reverse()
+    .toArray();
+}
+
+export async function mergeServerFoodEntries(userId, serverEntries) {
+  const localEntries = await db.foodEntries.where("userId").equals(userId).toArray();
+
+  for (const serverEntry of serverEntries) {
+    const localEntry = localEntries.find((e) => e._id === serverEntry._id);
+    if (!localEntry) {
+      // New entry from server
+      await db.foodEntries.add({
+        ...serverEntry,
+        syncStatus: "synced",
+      });
+    } else if (new Date(serverEntry.createdAt) > new Date(localEntry.createdAt)) {
+      // Server version is newer
+      await db.foodEntries.update(localEntry.localId, {
+        ...serverEntry,
+        syncStatus: "synced",
+      });
+    }
+  }
+}
+
+export async function mergeServerWeightEntries(userId, serverEntries) {
+  const localEntries = await db.weightEntries.where("userId").equals(userId).toArray();
+
+  for (const serverEntry of serverEntries) {
+    const localEntry = localEntries.find((e) => e._id === serverEntry._id);
+    if (!localEntry) {
+      // New entry from server
+      await db.weightEntries.add({
+        ...serverEntry,
+        syncStatus: "synced",
+      });
+    } else if (new Date(serverEntry.createdAt) > new Date(localEntry.createdAt)) {
+      // Server version is newer
+      await db.weightEntries.update(localEntry.localId, {
+        ...serverEntry,
+        syncStatus: "synced",
+      });
+    }
+  }
+}

@@ -3,7 +3,8 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { apiFetch } from "../lib/apiClient";
 import { todayISO } from "../lib/date";
-import { addWeightEntry } from "../lib/db";
+import { addWeightEntry, getWeightEntries } from "../lib/db";
+import { pullServerDataAndMerge } from "../lib/syncEngine";
 
 export default function WeightLog() {
   const { token } = useAuth();
@@ -15,11 +16,34 @@ export default function WeightLog() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    apiFetch("/api/weight-entries?range=month", { token })
-      .then(setEntries)
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
-  }, [token]);
+    async function load() {
+      try {
+        // Read from IndexedDB first
+        const localEntries = await getWeightEntries(user?._id);
+        setEntries(localEntries);
+        setLoading(false);
+
+        // Pull from server in background
+        if (navigator.onLine) {
+          try {
+            const today = todayISO();
+            await pullServerDataAndMerge(user?._id, token, today);
+            const mergedEntries = await getWeightEntries(user?._id);
+            setEntries(mergedEntries);
+          } catch (err) {
+            console.error("Background sync failed:", err);
+          }
+        }
+      } catch (err) {
+        setError(err.message);
+        setLoading(false);
+      }
+    }
+
+    if (user?._id && token) {
+      load();
+    }
+  }, [user?._id, token]);
 
   async function handleSubmit(e) {
     e.preventDefault();

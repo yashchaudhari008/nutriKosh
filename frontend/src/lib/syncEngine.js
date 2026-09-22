@@ -1,4 +1,4 @@
-import { getPendingEntries, markEntrySynced } from "./db";
+import { getPendingEntries, markEntrySynced, getFoodEntriesByDate, mergeServerFoodEntries, mergeServerWeightEntries } from "./db";
 import { apiFetch } from "./apiClient";
 
 let syncInProgress = false;
@@ -67,6 +67,24 @@ export async function syncPendingEntries(token) {
     notifySyncStatus("offline");
   } finally {
     syncInProgress = false;
+  }
+}
+
+export async function pullServerDataAndMerge(userId, token, date) {
+  if (!navigator.onLine) return null;
+
+  try {
+    const serverFoodEntries = await apiFetch(`/api/food-entries?date=${date}`, { token });
+    const serverWeightEntries = await apiFetch(`/api/weight-entries?range=month`, { token });
+
+    // Merge server data with local, respecting last-write-wins
+    await mergeServerFoodEntries(userId, serverFoodEntries);
+    await mergeServerWeightEntries(userId, serverWeightEntries);
+
+    return { foodEntries: serverFoodEntries, weightEntries: serverWeightEntries };
+  } catch (err) {
+    console.error("Failed to pull server data:", err);
+    return null;
   }
 }
 

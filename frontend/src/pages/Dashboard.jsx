@@ -5,6 +5,8 @@ import { useAuth } from "../hooks/useAuth";
 import { useSync } from "../hooks/useSync";
 import { apiFetch } from "../lib/apiClient";
 import { todayISO, formatDateFull } from "../lib/date";
+import { getFoodEntriesByDate, getWeightEntriesByDateRange } from "../lib/db";
+import { pullServerDataAndMerge } from "../lib/syncEngine";
 
 export default function Dashboard() {
   const { user, token, logout } = useAuth();
@@ -17,13 +19,44 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([
-      apiFetch(`/api/food-entries?date=${todayISO()}`, { token }).then(setEntries),
-      apiFetch(`/api/weight-entries?range=month`, { token }).then(setAllWeightEntries),
-    ])
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
-  }, [token]);
+    async function load() {
+      try {
+        // Read from IndexedDB first (instant)
+        const today = todayISO();
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        const weekStart = sevenDaysAgo.toISOString().slice(0, 10);
+
+        const localFood = await getFoodEntriesByDate(user?._id, today);
+        const localWeight = await getWeightEntriesByDateRange(user?._id, weekStart, today);
+
+        setEntries(localFood);
+        setWeightEntries(localWeight);
+        setLoading(false);
+
+        // Pull from server in background
+        if (navigator.onLine) {
+          try {
+            await pullServerDataAndMerge(user?._id, token, today);
+            // Re-read merged data
+            const mergedFood = await getFoodEntriesByDate(user?._id, today);
+            const mergedWeight = await getWeightEntriesByDateRange(user?._id, weekStart, today);
+            setEntries(mergedFood);
+            setWeightEntries(mergedWeight);
+          } catch (err) {
+            console.error("Background sync failed:", err);
+          }
+        }
+      } catch (err) {
+        setError(err.message);
+        setLoading(false);
+      }
+    }
+
+    if (user?._id && token) {
+      load();
+    }
+  }, [user?._id, token]);
 
   useEffect(() => {
     if (weightRange === "week") {
@@ -176,7 +209,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <Link
             to="/food/add"
             className="rounded-md bg-slate-900 px-4 py-2 text-sm text-white"
@@ -185,6 +218,12 @@ export default function Dashboard() {
           </Link>
           <Link to="/weight" className="rounded-md border px-4 py-2 text-sm text-slate-700">
             Weight log
+          </Link>
+          <Link to="/history/food" className="rounded-md border px-4 py-2 text-sm text-slate-700">
+            Food history
+          </Link>
+          <Link to="/insights/weight" className="rounded-md border px-4 py-2 text-sm text-slate-700">
+            Insights
           </Link>
         </div>
 

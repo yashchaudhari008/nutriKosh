@@ -9,17 +9,30 @@ export default function Dashboard() {
   const { user, token, logout } = useAuth();
   const [entries, setEntries] = useState([]);
   const [weightEntries, setWeightEntries] = useState([]);
+  const [allWeightEntries, setAllWeightEntries] = useState([]);
+  const [weightRange, setWeightRange] = useState("week");
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     Promise.all([
       apiFetch(`/api/food-entries?date=${todayISO()}`, { token }).then(setEntries),
-      apiFetch(`/api/weight-entries?range=week`, { token }).then(setWeightEntries),
+      apiFetch(`/api/weight-entries?range=month`, { token }).then(setAllWeightEntries),
     ])
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, [token]);
+
+  useEffect(() => {
+    if (weightRange === "week") {
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+      const cutoffDate = sevenDaysAgo.toISOString().slice(0, 10);
+      setWeightEntries(allWeightEntries.filter((e) => e.date >= cutoffDate));
+    } else {
+      setWeightEntries(allWeightEntries);
+    }
+  }, [weightRange, allWeightEntries]);
 
   async function handleDelete(id) {
     try {
@@ -63,7 +76,31 @@ export default function Dashboard() {
           </div>
 
           <div className="rounded-lg border bg-white p-6 shadow-sm flex flex-col items-center justify-center">
-            <p className="text-xs text-slate-500 mb-2">Weight</p>
+            <div className="w-full flex items-center justify-between mb-2">
+              <p className="text-xs text-slate-500">Weight</p>
+              <div className="flex gap-1">
+                <button
+                  onClick={() => setWeightRange("week")}
+                  className={`px-2 py-1 text-xs rounded ${
+                    weightRange === "week"
+                      ? "bg-slate-900 text-white"
+                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                  }`}
+                >
+                  1W
+                </button>
+                <button
+                  onClick={() => setWeightRange("month")}
+                  className={`px-2 py-1 text-xs rounded ${
+                    weightRange === "month"
+                      ? "bg-slate-900 text-white"
+                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                  }`}
+                >
+                  1M
+                </button>
+              </div>
+            </div>
             <p className="text-3xl font-semibold text-slate-900">
               {weightEntries.length > 0 ? weightEntries[weightEntries.length - 1].weight : "—"}
             </p>
@@ -88,9 +125,21 @@ export default function Dashboard() {
                             padding: "4px 8px",
                             fontSize: "12px",
                           }}
-                          labelFormatter={() => ""}
+                          labelFormatter={(value) => value || ""}
                           formatter={(value) => [value.toFixed(1), "kg"]}
                           cursor={false}
+                          content={({ active, payload }) => {
+                            if (active && payload?.[0]) {
+                              const data = payload[0].payload;
+                              return (
+                                <div className="bg-slate-50 border border-slate-200 rounded px-2 py-1 text-xs">
+                                  <p className="font-medium">{data.date}</p>
+                                  <p className="text-slate-600">{data.weight.toFixed(1)} kg</p>
+                                </div>
+                              );
+                            }
+                            return null;
+                          }}
                         />
                         <Line
                           type="monotone"

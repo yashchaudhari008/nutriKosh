@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { LineChart, Line, ResponsiveContainer } from "recharts";
+import { LineChart, Line, ResponsiveContainer, YAxis, Tooltip } from "recharts";
 import { useAuth } from "../hooks/useAuth";
 import { apiFetch } from "../lib/apiClient";
 import { todayISO } from "../lib/date";
@@ -69,9 +69,28 @@ export default function Dashboard() {
             </p>
             <p className="text-xs text-slate-400 mt-1">kg</p>
             {weightEntries.length > 1 && (
-              <div className="w-full mt-4 h-12">
+              <div className="w-full mt-4 h-16">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={weightEntries}>
+                  <LineChart data={weightEntries} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
+                    <YAxis
+                      type="number"
+                      dataKey="weight"
+                      domain="dataMin"
+                      width={30}
+                      tick={{ fontSize: 10 }}
+                      stroke="#94a3b8"
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "#f1f5f9",
+                        border: "1px solid #cbd5e1",
+                        borderRadius: "4px",
+                        padding: "4px 8px",
+                      }}
+                      labelFormatter={() => ""}
+                      formatter={(value) => [value.toFixed(1), "kg"]}
+                      cursor={false}
+                    />
                     <Line
                       type="monotone"
                       dataKey="weight"

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { apiFetch } from "../lib/apiClient";
 import { todayISO } from "../lib/date";
+import { addWeightEntry } from "../lib/db";
 
 export default function WeightLog() {
   const { token } = useAuth();
@@ -24,12 +25,22 @@ export default function WeightLog() {
     e.preventDefault();
     setError(null);
     try {
-      const entry = await apiFetch("/api/weight-entries", {
-        method: "POST",
-        token,
-        body: { date, weight: Number(weight), note: note || undefined },
+      // Write to IndexedDB first (optimistic)
+      const localId = await addWeightEntry({
+        userId: "mock-user", // Will be replaced by actual userId when integrated
+        date,
+        weight: Number(weight),
+        note: note || undefined,
       });
-      setEntries((prev) => [...prev, entry].sort((a, b) => a.date.localeCompare(b.date)));
+
+      // Optimistic UI update
+      setEntries((prev) =>
+        [
+          ...prev,
+          { localId, date, weight: Number(weight), note: note || undefined },
+        ].sort((a, b) => a.date.localeCompare(b.date))
+      );
+
       setWeight("");
       setDate(todayISO());
       setNote("");

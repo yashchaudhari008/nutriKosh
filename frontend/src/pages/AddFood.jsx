@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { apiFetch } from "../lib/apiClient";
 import { todayISO } from "../lib/date";
+import { addFoodEntry } from "../lib/db";
 
 const EMPTY_FORM = {
   foodName: "",
@@ -64,20 +65,20 @@ export default function AddFood() {
     setError(null);
     setSaving(true);
     try {
-      await apiFetch("/api/food-entries", {
-        method: "POST",
-        token,
-        body: {
-          date: todayISO(),
-          foodName: form.foodName,
-          quantity: Number(form.quantity),
-          unit: form.unit,
-          protein: Number(form.protein),
-          calories: Number(form.calories),
-          carbs: form.carbs === "" ? undefined : Number(form.carbs),
-          fat: form.fat === "" ? undefined : Number(form.fat),
-        },
+      // Write to IndexedDB first (optimistic)
+      await addFoodEntry({
+        userId: "mock-user", // Will be replaced by actual userId when integrated with auth context
+        date: todayISO(),
+        foodName: form.foodName,
+        quantity: Number(form.quantity),
+        unit: form.unit,
+        protein: Number(form.protein),
+        calories: Number(form.calories),
+        carbs: form.carbs === "" ? undefined : Number(form.carbs),
+        fat: form.fat === "" ? undefined : Number(form.fat),
+        source: "manual",
       });
+      // Sync engine will handle sending to API in background
       navigate("/");
     } catch (err) {
       setError(err.message);

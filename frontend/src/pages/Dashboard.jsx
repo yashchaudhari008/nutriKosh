@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { LineChart, Line, ResponsiveContainer, Tooltip, Label } from "recharts";
 import { useAuth } from "../hooks/useAuth";
+import { useSync } from "../hooks/useSync";
 import { apiFetch } from "../lib/apiClient";
 import { todayISO, formatDateFull } from "../lib/date";
 
 export default function Dashboard() {
   const { user, token, logout } = useAuth();
+  const syncStatus = useSync();
   const [entries, setEntries] = useState([]);
   const [weightEntries, setWeightEntries] = useState([]);
   const [allWeightEntries, setAllWeightEntries] = useState([]);
@@ -53,12 +55,25 @@ export default function Dashboard() {
       <div className="mx-auto max-w-2xl space-y-4">
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-semibold">Hi, {user?.name}</h1>
-          <button
-            onClick={logout}
-            className="rounded-md border px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-100"
-          >
-            Log out
-          </button>
+          <div className="flex items-center gap-2">
+            <span
+              className={`text-xs font-medium px-2 py-1 rounded ${
+                syncStatus === "synced"
+                  ? "bg-green-100 text-green-700"
+                  : syncStatus === "syncing"
+                  ? "bg-blue-100 text-blue-700"
+                  : "bg-orange-100 text-orange-700"
+              }`}
+            >
+              {syncStatus === "synced" ? "✓ Synced" : syncStatus === "syncing" ? "⟳ Syncing" : "⊘ Offline"}
+            </span>
+            <button
+              onClick={logout}
+              className="rounded-md border px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-100"
+            >
+              Log out
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4 max-w-md">

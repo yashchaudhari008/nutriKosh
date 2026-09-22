@@ -100,13 +100,14 @@ export default function WeightLog() {
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="w-full rounded-md border px-3 py-2 text-sm opacity-0 absolute h-10 cursor-pointer"
+                className="absolute inset-0 w-full h-10 opacity-0 cursor-pointer"
+                style={{ zIndex: 10 }}
               />
               <input
                 type="text"
                 readOnly
                 value={formatDateFull(date)}
-                className="w-full rounded-md border px-3 py-2 text-sm bg-white pointer-events-none"
+                className="w-full rounded-md border px-3 py-2 text-sm bg-white"
               />
             </div>
           </div>

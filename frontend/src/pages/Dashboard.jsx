@@ -7,12 +7,15 @@ import { todayISO } from "../lib/date";
 export default function Dashboard() {
   const { user, token, logout } = useAuth();
   const [entries, setEntries] = useState([]);
+  const [weightEntries, setWeightEntries] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    apiFetch(`/api/food-entries?date=${todayISO()}`, { token })
-      .then(setEntries)
+    Promise.all([
+      apiFetch(`/api/food-entries?date=${todayISO()}`, { token }).then(setEntries),
+      apiFetch(`/api/weight-entries?range=week`, { token }).then(setWeightEntries),
+    ])
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, [token]);
@@ -44,17 +47,27 @@ export default function Dashboard() {
           </button>
         </div>
 
-        <div className="rounded-lg border bg-white p-6 shadow-sm">
-          <div className="flex items-baseline justify-between">
-            <p className="text-sm text-slate-500">Protein today</p>
-            <p className="text-sm text-slate-500">
-              {totalProtein}g / {proteinGoal || "—"}g
+        <div className="grid grid-cols-3 gap-4">
+          <div className="col-span-2 rounded-lg border bg-white p-6 shadow-sm">
+            <div className="flex items-baseline justify-between">
+              <p className="text-sm text-slate-500">Protein today</p>
+              <p className="text-sm text-slate-500">
+                {totalProtein}g / {proteinGoal || "—"}g
+              </p>
+            </div>
+            <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-slate-100">
+              <div className="h-full bg-slate-900" style={{ width: `${proteinPct}%` }} />
+            </div>
+            <p className="mt-3 text-sm text-slate-400">{totalCalories} kcal today</p>
+          </div>
+
+          <div className="rounded-lg border bg-white p-6 shadow-sm flex flex-col items-center justify-center">
+            <p className="text-xs text-slate-500 mb-2">Weight</p>
+            <p className="text-3xl font-semibold text-slate-900">
+              {weightEntries.length > 0 ? weightEntries[weightEntries.length - 1].weight : "—"}
             </p>
+            <p className="text-xs text-slate-400 mt-1">kg</p>
           </div>
-          <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-slate-100">
-            <div className="h-full bg-slate-900" style={{ width: `${proteinPct}%` }} />
-          </div>
-          <p className="mt-3 text-sm text-slate-400">{totalCalories} kcal today</p>
         </div>
 
         <div className="flex gap-2">

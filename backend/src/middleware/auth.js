@@ -2,7 +2,7 @@ import { verifySessionToken } from "../utils/jwt.js";
 import User from "../models/User.js";
 
 const DEV_MODE = process.env.NODE_ENV === "development";
-const DEV_USER_ID = "dev-user";
+const DEV_USER_ID = "000000000000000000000001"; // Valid 24-char hex ObjectId
 
 export async function requireAuth(req, res, next) {
   // Dev bypass: if NODE_ENV=development and x-dev-user header is set, use mock user

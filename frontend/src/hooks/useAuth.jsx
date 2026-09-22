@@ -7,7 +7,7 @@ const AuthContext = createContext(null);
 // sign-in locally. Remove once auth needs real testing.
 const SKIP_AUTH = import.meta.env.VITE_SKIP_AUTH === "true";
 const MOCK_USER = {
-  _id: "dev-user",
+  _id: "000000000000000000000001",
   name: "Dev User",
   email: "dev@example.com",
   proteinGoal: 85,

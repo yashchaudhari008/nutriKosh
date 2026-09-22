@@ -78,6 +78,10 @@ export async function searchFoods(req, res) {
 
     cached.forEach((food) => {
       if (!seenIds.has(food.foodName.toLowerCase())) {
+        // Skip foods with all zero nutrition values
+        if (food.protein === 0 && food.calories === 0 && food.carbs === 0 && food.fat === 0) {
+          return;
+        }
         const override = overrideMap.get(food.foodId);
         const result = {
           _id: food._id,

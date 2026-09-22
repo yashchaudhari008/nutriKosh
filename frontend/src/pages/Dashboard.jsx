@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { LineChart, Line, ResponsiveContainer, Tooltip, Label } from "recharts";
 import { useAuth } from "../hooks/useAuth";
 import { apiFetch } from "../lib/apiClient";
-import { todayISO } from "../lib/date";
+import { todayISO, formatDateFull } from "../lib/date";
 
 export default function Dashboard() {
   const { user, token, logout } = useAuth();
@@ -133,7 +133,7 @@ export default function Dashboard() {
                               const data = payload[0].payload;
                               return (
                                 <div className="bg-slate-50 border border-slate-200 rounded px-2 py-1 text-xs">
-                                  <p className="font-medium">{data.date}</p>
+                                  <p className="font-medium">{formatDateFull(data.date)}</p>
                                   <p className="text-slate-600">{data.weight.toFixed(1)} kg</p>
                                 </div>
                               );

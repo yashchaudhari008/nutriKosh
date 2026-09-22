@@ -4,6 +4,7 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import AddFood from "./pages/AddFood";
 import WeightLog from "./pages/WeightLog";
+import AdminFoods from "./pages/AdminFoods";
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
@@ -37,6 +38,14 @@ export default function App() {
         element={
           <ProtectedRoute>
             <WeightLog />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/foods"
+        element={
+          <ProtectedRoute>
+            <AdminFoods />
           </ProtectedRoute>
         }
       />

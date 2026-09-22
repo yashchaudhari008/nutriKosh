@@ -36,10 +36,10 @@ export async function searchUSDA(query, apiKey) {
         source: "usda",
         quantity: 100,
         unit: "g",
-        protein: getByNutrientId(203),
-        calories: getByNutrientId(208),
-        carbs: getByNutrientId(205),
-        fat: getByNutrientId(204),
+        protein: getByNutrientId(1003),
+        calories: getByNutrientId(1008),
+        carbs: getByNutrientId(1005),
+        fat: getByNutrientId(1004),
       };
     });
   } catch {

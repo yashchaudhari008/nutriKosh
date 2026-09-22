@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { LineChart, Line, ResponsiveContainer, YAxis, Tooltip } from "recharts";
+import { LineChart, Line, ResponsiveContainer, Tooltip } from "recharts";
 import { useAuth } from "../hooks/useAuth";
 import { apiFetch } from "../lib/apiClient";
 import { todayISO } from "../lib/date";
@@ -68,41 +68,45 @@ export default function Dashboard() {
               {weightEntries.length > 0 ? weightEntries[weightEntries.length - 1].weight : "—"}
             </p>
             <p className="text-xs text-slate-400 mt-1">kg</p>
-            {weightEntries.length > 1 && (
-              <div className="w-full mt-4 h-16">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={weightEntries} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
-                    <YAxis
-                      type="number"
-                      dataKey="weight"
-                      domain="dataMin"
-                      width={30}
-                      tick={{ fontSize: 10 }}
-                      stroke="#94a3b8"
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "#f1f5f9",
-                        border: "1px solid #cbd5e1",
-                        borderRadius: "4px",
-                        padding: "4px 8px",
-                      }}
-                      labelFormatter={() => ""}
-                      formatter={(value) => [value.toFixed(1), "kg"]}
-                      cursor={false}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="weight"
-                      stroke="#64748b"
-                      strokeWidth={2}
-                      dot={false}
-                      isAnimationActive={false}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            )}
+            {weightEntries.length > 1 && (() => {
+              const weights = weightEntries.map((e) => e.weight);
+              const minWeight = Math.min(...weights);
+              const maxWeight = Math.max(...weights);
+              return (
+                <>
+                  <div className="w-full mt-4 flex justify-between text-xs text-slate-400 px-1 mb-1">
+                    <span>Min: {minWeight.toFixed(1)}</span>
+                    <span>Max: {maxWeight.toFixed(1)}</span>
+                  </div>
+                  <div className="w-full h-10">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={weightEntries} margin={{ top: 0, right: 5, left: 5, bottom: 0 }}>
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: "#f1f5f9",
+                            border: "1px solid #cbd5e1",
+                            borderRadius: "4px",
+                            padding: "4px 8px",
+                            fontSize: "12px",
+                          }}
+                          labelFormatter={() => ""}
+                          formatter={(value) => [value.toFixed(1), "kg"]}
+                          cursor={false}
+                        />
+                        <Line
+                          type="monotone"
+                          dataKey="weight"
+                          stroke="#64748b"
+                          strokeWidth={2}
+                          dot={false}
+                          isAnimationActive={false}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </>
+              );
+            })()}
           </div>
         </div>
 

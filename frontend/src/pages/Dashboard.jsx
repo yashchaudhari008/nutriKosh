@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { LineChart, Line, ResponsiveContainer } from "recharts";
 import { useAuth } from "../hooks/useAuth";
 import { apiFetch } from "../lib/apiClient";
 import { todayISO } from "../lib/date";
@@ -67,6 +68,22 @@ export default function Dashboard() {
               {weightEntries.length > 0 ? weightEntries[weightEntries.length - 1].weight : "—"}
             </p>
             <p className="text-xs text-slate-400 mt-1">kg</p>
+            {weightEntries.length > 1 && (
+              <div className="w-full mt-4 h-12">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={weightEntries}>
+                    <Line
+                      type="monotone"
+                      dataKey="weight"
+                      stroke="#64748b"
+                      strokeWidth={2}
+                      dot={false}
+                      isAnimationActive={false}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            )}
           </div>
         </div>
 

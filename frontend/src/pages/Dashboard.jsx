@@ -30,15 +30,6 @@ export default function Dashboard() {
         const localFood = await getFoodEntriesByDate(user?._id, today);
         let localWeight = await getWeightEntriesByDateRange(user?._id, weekStart, today);
 
-        // Fallback to API if no local weight data
-        if (localWeight.length === 0) {
-          try {
-            localWeight = await apiFetch(`/api/weight-entries?range=month`, { token });
-          } catch (err) {
-            console.error("Failed to fetch weight from API:", err);
-          }
-        }
-
         setEntries(localFood);
         setAllWeightEntries(localWeight);
         setLoading(false);
@@ -46,12 +37,13 @@ export default function Dashboard() {
         // Pull from server in background
         if (navigator.onLine) {
           try {
-            await pullServerDataAndMerge(user?._id, token, today);
-            // Re-read merged data
-            const mergedFood = await getFoodEntriesByDate(user?._id, today);
-            const mergedWeight = await getWeightEntriesByDateRange(user?._id, weekStart, today);
-            setEntries(mergedFood);
-            setAllWeightEntries(mergedWeight);
+            const serverData = await apiFetch(`/api/weight-entries?range=month`, { token });
+            // Use server data if local is empty
+            if (localWeight.length === 0 && serverData.length > 0) {
+              setAllWeightEntries(serverData);
+            }
+          } catch (err) {
+            console.error("Failed to fetch weight:", err);
           } catch (err) {
             console.error("Background sync failed:", err);
           }

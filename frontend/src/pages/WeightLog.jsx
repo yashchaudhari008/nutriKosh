@@ -95,21 +95,14 @@ export default function WeightLog() {
         <form onSubmit={handleSubmit} className="space-y-3 rounded-lg border bg-white p-4 shadow-sm">
           <div>
             <label className="block text-xs font-medium text-slate-500 mb-1">Date</label>
-            <div className="relative">
-              <input
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                className="absolute inset-0 w-full h-10 opacity-0 cursor-pointer"
-                style={{ zIndex: 10 }}
-              />
-              <input
-                type="text"
-                readOnly
-                value={formatDateFull(date)}
-                className="w-full rounded-md border px-3 py-2 text-sm bg-white"
-              />
-            </div>
+            <input
+              required
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="w-full rounded-md border px-3 py-2 text-sm"
+            />
+            <p className="text-xs text-slate-500 mt-1">{formatDateFull(date)}</p>
           </div>
           <div className="flex gap-2">
             <input

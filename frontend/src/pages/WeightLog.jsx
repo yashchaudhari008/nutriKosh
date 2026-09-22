@@ -102,7 +102,6 @@ export default function WeightLog() {
               onChange={(e) => setDate(e.target.value)}
               className="w-full rounded-md border px-3 py-2 text-sm"
             />
-            <p className="text-xs text-slate-500 mt-1">{formatDateFull(date)}</p>
           </div>
           <div className="flex gap-2">
             <input

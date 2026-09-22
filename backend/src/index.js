@@ -7,6 +7,8 @@ import { errorHandler } from "./middleware/errorHandler.js";
 import authRoutes from "./routes/auth.js";
 import meRoutes from "./routes/me.js";
 import adminRoutes from "./routes/admin.js";
+import foodEntryRoutes from "./routes/foodEntries.js";
+import weightEntryRoutes from "./routes/weightEntries.js";
 
 const app = express();
 
@@ -18,6 +20,8 @@ app.get("/health", (req, res) => res.json({ ok: true }));
 app.use("/api/auth", authRoutes);
 app.use("/api/me", meRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/food-entries", foodEntryRoutes);
+app.use("/api/weight-entries", weightEntryRoutes);
 
 app.use(errorHandler);
 

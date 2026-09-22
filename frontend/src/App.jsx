@@ -2,6 +2,8 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { useAuth } from "./hooks/useAuth";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
+import AddFood from "./pages/AddFood";
+import WeightLog from "./pages/WeightLog";
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
@@ -19,6 +21,22 @@ export default function App() {
         element={
           <ProtectedRoute>
             <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/food/add"
+        element={
+          <ProtectedRoute>
+            <AddFood />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/weight"
+        element={
+          <ProtectedRoute>
+            <WeightLog />
           </ProtectedRoute>
         }
       />

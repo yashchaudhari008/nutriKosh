@@ -44,8 +44,6 @@ export default function Dashboard() {
             }
           } catch (err) {
             console.error("Failed to fetch weight:", err);
-          } catch (err) {
-            console.error("Background sync failed:", err);
           }
         }
       } catch (err) {

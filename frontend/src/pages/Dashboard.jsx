@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { LineChart, Line, ResponsiveContainer, Tooltip } from "recharts";
+import { LineChart, Line, ResponsiveContainer, Tooltip, Label } from "recharts";
 import { useAuth } from "../hooks/useAuth";
 import { apiFetch } from "../lib/apiClient";
 import { todayISO } from "../lib/date";
@@ -69,14 +69,13 @@ export default function Dashboard() {
             </p>
             <p className="text-xs text-slate-400 mt-1">kg</p>
             {weightEntries.length > 1 && (() => {
-              const weights = weightEntries.map((e) => e.weight);
-              const minWeight = Math.min(...weights);
-              const maxWeight = Math.max(...weights);
+              const first = weightEntries[0].weight;
+              const last = weightEntries[weightEntries.length - 1].weight;
               return (
                 <>
                   <div className="w-full mt-4 flex justify-between text-xs text-slate-400 px-1 mb-1">
-                    <span>Min: {minWeight.toFixed(1)}</span>
-                    <span>Max: {maxWeight.toFixed(1)}</span>
+                    <span>{first.toFixed(1)}</span>
+                    <span>{last.toFixed(1)}</span>
                   </div>
                   <div className="w-full h-10">
                     <ResponsiveContainer width="100%" height="100%">

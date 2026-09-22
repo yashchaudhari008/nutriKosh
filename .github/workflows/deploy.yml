@@ -33,9 +33,9 @@ jobs:
         run: cd frontend && npm run build
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+        uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./frontend/dist
-          force_orphan: true
-          cname: ""
+          path: ./frontend/dist
+
+      - name: Deploy artifact to GitHub Pages
+        uses: actions/deploy-pages@v4

@@ -16,7 +16,7 @@ const EMPTY_FORM = {
 };
 
 export default function AddFood() {
-  const { token } = useAuth();
+  const { user, token } = useAuth();
   const navigate = useNavigate();
   const [tab, setTab] = useState("search");
   const [form, setForm] = useState(EMPTY_FORM);
@@ -67,7 +67,7 @@ export default function AddFood() {
     try {
       // Write to IndexedDB first (optimistic)
       await addFoodEntry({
-        userId: "mock-user", // Will be replaced by actual userId when integrated with auth context
+        userId: user?._id,
         date: todayISO(),
         foodName: form.foodName,
         quantity: Number(form.quantity),

@@ -28,7 +28,16 @@ export default function Dashboard() {
         const weekStart = sevenDaysAgo.toISOString().slice(0, 10);
 
         const localFood = await getFoodEntriesByDate(user?._id, today);
-        const localWeight = await getWeightEntriesByDateRange(user?._id, weekStart, today);
+        let localWeight = await getWeightEntriesByDateRange(user?._id, weekStart, today);
+
+        // Fallback to API if no local weight data
+        if (localWeight.length === 0) {
+          try {
+            localWeight = await apiFetch(`/api/weight-entries?range=month`, { token });
+          } catch (err) {
+            console.error("Failed to fetch weight from API:", err);
+          }
+        }
 
         setEntries(localFood);
         setAllWeightEntries(localWeight);

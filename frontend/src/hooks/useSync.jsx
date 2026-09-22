@@ -1,9 +1,11 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { subscribeSyncStatus, initSyncListener } from "../lib/syncEngine";
+import { useAuth } from "./useAuth";
 
 const SyncContext = createContext(null);
 
-export function SyncProvider({ children, token }) {
+export function SyncProvider({ children }) {
+  const { token } = useAuth();
   const [syncStatus, setSyncStatus] = useState("synced");
 
   useEffect(() => {

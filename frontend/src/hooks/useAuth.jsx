@@ -3,12 +3,24 @@ import { apiFetch } from "../lib/apiClient";
 
 const AuthContext = createContext(null);
 
+// Temporary dev bypass: set VITE_SKIP_AUTH=true in frontend/.env to skip Google
+// sign-in locally. Remove once auth needs real testing.
+const SKIP_AUTH = import.meta.env.VITE_SKIP_AUTH === "true";
+const MOCK_USER = {
+  _id: "dev-user",
+  name: "Dev User",
+  email: "dev@example.com",
+  proteinGoal: 85,
+  isAdmin: true,
+};
+
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(() => localStorage.getItem("nutrikosh_token"));
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(SKIP_AUTH ? MOCK_USER : null);
+  const [loading, setLoading] = useState(!SKIP_AUTH);
 
   useEffect(() => {
+    if (SKIP_AUTH) return;
     if (!token) {
       setLoading(false);
       return;
@@ -33,6 +45,7 @@ export function AuthProvider({ children }) {
   }
 
   function logout() {
+    if (SKIP_AUTH) return;
     localStorage.removeItem("nutrikosh_token");
     setToken(null);
     setUser(null);

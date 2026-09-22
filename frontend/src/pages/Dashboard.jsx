@@ -260,6 +260,11 @@ export default function Dashboard() {
                     <p className="text-xs text-slate-400">
                       {entry.quantity}
                       {entry.unit} · {entry.protein}g protein · {entry.calories} kcal
+                      {entry.syncStatus && entry.syncStatus !== "synced" && (
+                        <span className={entry.syncStatus === "syncing" ? "text-blue-600" : "text-orange-600"}>
+                          {" "}· {entry.syncStatus === "syncing" ? "⟳ syncing" : "⊘ pending"}
+                        </span>
+                      )}
                     </p>
                   </div>
                   <button

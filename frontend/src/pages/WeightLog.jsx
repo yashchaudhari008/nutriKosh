@@ -73,10 +73,13 @@ export default function WeightLog() {
     }
   }
 
-  async function handleDelete(id) {
+  async function handleDelete(id, localId) {
     try {
-      await apiFetch(`/api/weight-entries/${id}`, { method: "DELETE", token });
-      setEntries((prev) => prev.filter((e) => e._id !== id));
+      // Only delete from API if it has a server _id
+      if (id) {
+        await apiFetch(`/api/weight-entries/${id}`, { method: "DELETE", token });
+      }
+      setEntries((prev) => prev.filter((e) => e._id !== id && e.localId !== localId));
     } catch (err) {
       setError(err.message);
     }
@@ -157,7 +160,7 @@ export default function WeightLog() {
                     </p>
                   </div>
                   <button
-                    onClick={() => handleDelete(entry._id)}
+                    onClick={() => handleDelete(entry._id, entry.localId)}
                     className="text-xs text-red-500 hover:underline"
                   >
                     Delete

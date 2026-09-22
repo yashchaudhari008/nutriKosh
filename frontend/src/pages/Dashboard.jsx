@@ -12,6 +12,7 @@ export default function Dashboard() {
   const { user, token, logout } = useAuth();
   const syncStatus = useSync();
   const [entries, setEntries] = useState([]);
+  const [lastSyncStatus, setLastSyncStatus] = useState(syncStatus);
   const [weightEntries, setWeightEntries] = useState([]);
   const [allWeightEntries, setAllWeightEntries] = useState([]);
   const [weightRange, setWeightRange] = useState("week");
@@ -56,6 +57,25 @@ export default function Dashboard() {
       load();
     }
   }, [user?._id, token]);
+
+  useEffect(() => {
+    // Re-fetch entries when sync completes to show updated statuses
+    if (syncStatus === "synced" && lastSyncStatus !== "synced") {
+      const today = todayISO();
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+      const weekStart = sevenDaysAgo.toISOString().slice(0, 10);
+
+      Promise.all([
+        getFoodEntriesByDate(user?._id, today),
+        getWeightEntriesByDateRange(user?._id, weekStart, today)
+      ]).then(([food, weight]) => {
+        setEntries(food);
+        setAllWeightEntries(weight);
+      });
+    }
+    setLastSyncStatus(syncStatus);
+  }, [syncStatus, user?._id]);
 
   function sampleEntries(ents, maxPoints = 10) {
     if (ents.length <= maxPoints) return ents;
@@ -173,7 +193,7 @@ export default function Dashboard() {
                 </button>
               </div>
             </div>
-            {weightEntries.length > 1 && (() => {
+            {weightEntries.length >= 1 && (() => {
               const first = weightEntries[0].weight;
               const last = weightEntries[weightEntries.length - 1].weight;
               return (

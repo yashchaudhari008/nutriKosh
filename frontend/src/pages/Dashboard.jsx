@@ -31,7 +31,7 @@ export default function Dashboard() {
         const localWeight = await getWeightEntriesByDateRange(user?._id, weekStart, today);
 
         setEntries(localFood);
-        setWeightEntries(localWeight);
+        setAllWeightEntries(localWeight);
         setLoading(false);
 
         // Pull from server in background
@@ -42,7 +42,7 @@ export default function Dashboard() {
             const mergedFood = await getFoodEntriesByDate(user?._id, today);
             const mergedWeight = await getWeightEntriesByDateRange(user?._id, weekStart, today);
             setEntries(mergedFood);
-            setWeightEntries(mergedWeight);
+            setAllWeightEntries(mergedWeight);
           } catch (err) {
             console.error("Background sync failed:", err);
           }

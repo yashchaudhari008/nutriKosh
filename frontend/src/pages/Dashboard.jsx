@@ -119,7 +119,7 @@ export default function Dashboard() {
                   </div>
                   <div className="w-full h-6">
                     <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={weightEntries} margin={{ top: 0, right: 5, left: 5, bottom: 0 }}>
+                      <LineChart data={weightEntries} margin={{ top: 5, right: 8, left: 8, bottom: 5 }}>
                         <Tooltip
                           contentStyle={{
                             backgroundColor: "#f1f5f9",
@@ -149,7 +149,7 @@ export default function Dashboard() {
                           dataKey="weight"
                           stroke="#64748b"
                           strokeWidth={2}
-                          dot={false}
+                          dot={{ fill: "#64748b", r: 3 }}
                           isAnimationActive={false}
                         />
                       </LineChart>

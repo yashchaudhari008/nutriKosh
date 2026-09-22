@@ -9,17 +9,20 @@ import { pullServerDataAndMerge } from "../lib/syncEngine";
 export default function WeightLog() {
   const { user, token } = useAuth();
   const [entries, setEntries] = useState([]);
+  const [allEntries, setAllEntries] = useState([]);
   const [weight, setWeight] = useState("");
   const [date, setDate] = useState(todayISO());
   const [note, setNote] = useState("");
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [range, setRange] = useState("all");
 
   useEffect(() => {
     async function load() {
       try {
         // Read from IndexedDB first
         const localEntries = await getWeightEntries(user?._id);
+        setAllEntries(localEntries);
         setEntries(localEntries);
         setLoading(false);
 
@@ -29,6 +32,7 @@ export default function WeightLog() {
             const today = todayISO();
             await pullServerDataAndMerge(user?._id, token, today);
             const mergedEntries = await getWeightEntries(user?._id);
+            setAllEntries(mergedEntries);
             setEntries(mergedEntries);
           } catch (err) {
             console.error("Background sync failed:", err);
@@ -82,6 +86,20 @@ export default function WeightLog() {
     }
   }
 
+  function sampleEntries(ents, maxPoints = 10) {
+    if (ents.length <= maxPoints) return ents;
+    const step = Math.floor(ents.length / maxPoints);
+    return ents.filter((_, idx) => idx % step === 0 || idx === ents.length - 1);
+  }
+
+  useEffect(() => {
+    if (range === "all") {
+      setEntries(sampleEntries(allEntries, 10));
+    } else {
+      setEntries(allEntries);
+    }
+  }, [range, allEntries]);
+
   return (
     <div className="min-h-screen bg-slate-50 p-6">
       <div className="mx-auto max-w-md space-y-4">
@@ -90,6 +108,29 @@ export default function WeightLog() {
           <Link to="/" className="text-sm text-slate-500 hover:underline">
             Back
           </Link>
+        </div>
+
+        <div className="flex gap-2">
+          <button
+            onClick={() => setRange("month")}
+            className={`px-3 py-1.5 text-xs rounded font-medium transition ${
+              range === "month"
+                ? "bg-slate-900 text-white"
+                : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+            }`}
+          >
+            Recent
+          </button>
+          <button
+            onClick={() => setRange("all")}
+            className={`px-3 py-1.5 text-xs rounded font-medium transition ${
+              range === "all"
+                ? "bg-slate-900 text-white"
+                : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+            }`}
+          >
+            Lifetime
+          </button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-3 rounded-lg border bg-white p-4 shadow-sm">

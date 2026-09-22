@@ -137,7 +137,7 @@ export default function WeightLog() {
           ) : (
             <ul className="divide-y">
               {[...entries].reverse().map((entry) => (
-                <li key={entry._id} className="flex items-center justify-between px-4 py-3">
+                <li key={entry._id || entry.localId} className="flex items-center justify-between px-4 py-3">
                   <div>
                     <p className="text-sm font-medium">{entry.weight} kg</p>
                     <p className="text-xs text-slate-400">

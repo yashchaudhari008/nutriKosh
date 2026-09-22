@@ -8,6 +8,7 @@ export default function WeightLog() {
   const { token } = useAuth();
   const [entries, setEntries] = useState([]);
   const [weight, setWeight] = useState("");
+  const [date, setDate] = useState(todayISO());
   const [note, setNote] = useState("");
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -26,10 +27,11 @@ export default function WeightLog() {
       const entry = await apiFetch("/api/weight-entries", {
         method: "POST",
         token,
-        body: { date: todayISO(), weight: Number(weight), note: note || undefined },
+        body: { date, weight: Number(weight), note: note || undefined },
       });
       setEntries((prev) => [...prev, entry].sort((a, b) => a.date.localeCompare(b.date)));
       setWeight("");
+      setDate(todayISO());
       setNote("");
     } catch (err) {
       setError(err.message);
@@ -55,27 +57,39 @@ export default function WeightLog() {
           </Link>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex gap-2 rounded-lg border bg-white p-4 shadow-sm">
-          <input
-            required
-            type="number"
-            min="0"
-            step="any"
-            placeholder="kg"
-            value={weight}
-            onChange={(e) => setWeight(e.target.value)}
-            className="w-24 rounded-md border px-3 py-2 text-sm"
-          />
-          <input
-            type="text"
-            placeholder="Note (optional)"
-            value={note}
-            onChange={(e) => setNote(e.target.value)}
-            className="flex-1 rounded-md border px-3 py-2 text-sm"
-          />
-          <button type="submit" className="rounded-md bg-slate-900 px-4 py-2 text-sm text-white">
-            Log
-          </button>
+        <form onSubmit={handleSubmit} className="space-y-3 rounded-lg border bg-white p-4 shadow-sm">
+          <div>
+            <label className="block text-xs font-medium text-slate-500 mb-1">Date</label>
+            <input
+              required
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="w-full rounded-md border px-3 py-2 text-sm"
+            />
+          </div>
+          <div className="flex gap-2">
+            <input
+              required
+              type="number"
+              min="0"
+              step="any"
+              placeholder="kg"
+              value={weight}
+              onChange={(e) => setWeight(e.target.value)}
+              className="w-24 rounded-md border px-3 py-2 text-sm"
+            />
+            <input
+              type="text"
+              placeholder="Note (optional)"
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              className="flex-1 rounded-md border px-3 py-2 text-sm"
+            />
+            <button type="submit" className="rounded-md bg-slate-900 px-4 py-2 text-sm text-white">
+              Log
+            </button>
+          </div>
         </form>
 
         {error && <p className="text-sm text-red-600">{error}</p>}

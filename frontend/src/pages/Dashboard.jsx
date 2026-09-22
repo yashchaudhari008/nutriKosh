@@ -61,27 +61,45 @@ export default function Dashboard() {
           </button>
         </div>
 
-        <div className="grid grid-cols-3 gap-4">
-          <div className="col-span-2 rounded-lg border bg-white p-6 shadow-sm">
-            <div className="flex items-baseline justify-between">
-              <p className="text-sm text-slate-500">Protein today</p>
-              <p className="text-sm text-slate-500">
-                {totalProtein}g / {proteinGoal || "—"}g
-              </p>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="aspect-square rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 p-6 shadow-md flex flex-col items-center justify-center text-white">
+            <p className="text-sm opacity-75 mb-2">Protein</p>
+            <div className="relative w-24 h-24 flex items-center justify-center mb-4">
+              <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="45"
+                  fill="none"
+                  stroke="rgba(255,255,255,0.1)"
+                  strokeWidth="6"
+                />
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="45"
+                  fill="none"
+                  stroke="white"
+                  strokeWidth="6"
+                  strokeDasharray={`${2 * Math.PI * 45 * (proteinPct / 100)} ${2 * Math.PI * 45}`}
+                  strokeLinecap="round"
+                />
+              </svg>
+              <div className="absolute text-center">
+                <p className="text-2xl font-bold">{totalProtein}</p>
+                <p className="text-xs opacity-75">/ {proteinGoal || "—"}</p>
+              </div>
             </div>
-            <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-slate-100">
-              <div className="h-full bg-slate-900" style={{ width: `${proteinPct}%` }} />
-            </div>
-            <p className="mt-3 text-sm text-slate-400">{totalCalories} kcal today</p>
+            <p className="text-xs opacity-75">{totalCalories} kcal</p>
           </div>
 
-          <div className="rounded-lg border bg-white p-6 shadow-sm flex flex-col items-center justify-center">
-            <div className="w-full flex items-center justify-between mb-2">
-              <p className="text-xs text-slate-500">Weight</p>
+          <div className="aspect-square rounded-2xl bg-white border border-slate-200 shadow-md p-6 flex flex-col items-center justify-center">
+            <div className="w-full flex items-center justify-between mb-4">
+              <p className="text-xs font-semibold text-slate-600">Weight</p>
               <div className="flex gap-1">
                 <button
                   onClick={() => setWeightRange("week")}
-                  className={`px-2 py-1 text-xs rounded ${
+                  className={`px-2 py-1 text-xs font-medium rounded transition ${
                     weightRange === "week"
                       ? "bg-slate-900 text-white"
                       : "bg-slate-100 text-slate-600 hover:bg-slate-200"
@@ -91,7 +109,7 @@ export default function Dashboard() {
                 </button>
                 <button
                   onClick={() => setWeightRange("month")}
-                  className={`px-2 py-1 text-xs rounded ${
+                  className={`px-2 py-1 text-xs font-medium rounded transition ${
                     weightRange === "month"
                       ? "bg-slate-900 text-white"
                       : "bg-slate-100 text-slate-600 hover:bg-slate-200"
@@ -101,10 +119,10 @@ export default function Dashboard() {
                 </button>
               </div>
             </div>
-            <p className="text-3xl font-semibold text-slate-900">
+            <p className="text-4xl font-bold text-slate-900 mb-1">
               {weightEntries.length > 0 ? weightEntries[weightEntries.length - 1].weight : "—"}
             </p>
-            <p className="text-xs text-slate-400 mt-1">kg</p>
+            <p className="text-sm text-slate-400 mb-3">kg</p>
             {weightEntries.length > 1 && (() => {
               const first = weightEntries[0].weight;
               const last = weightEntries[weightEntries.length - 1].weight;

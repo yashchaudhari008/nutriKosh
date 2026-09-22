@@ -7,6 +7,7 @@ import { apiFetch } from "../lib/apiClient";
 import { todayISO, formatDateFull } from "../lib/date";
 import { getFoodEntriesByDate, getWeightEntriesByDateRange } from "../lib/db";
 import { pullServerDataAndMerge } from "../lib/syncEngine";
+import SyncModal from "../components/SyncModal";
 
 export default function Dashboard() {
   const { user, token, logout } = useAuth();
@@ -18,6 +19,8 @@ export default function Dashboard() {
   const [weightRange, setWeightRange] = useState("week");
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showSyncModal, setShowSyncModal] = useState(false);
+  const [pendingEntries, setPendingEntries] = useState([]);
 
   useEffect(() => {
     async function load() {
@@ -57,6 +60,23 @@ export default function Dashboard() {
       load();
     }
   }, [user?._id, token]);
+
+  useEffect(() => {
+    // Collect pending/syncing entries for modal
+    const pending = [
+      ...entries.filter(e => e.syncStatus === "pending" || e.syncStatus === "syncing").map(e => ({
+        type: "food",
+        name: e.foodName,
+        date: e.date
+      })),
+      ...allWeightEntries.filter(e => e.syncStatus === "pending" || e.syncStatus === "syncing").map(e => ({
+        type: "weight",
+        weight: e.weight,
+        date: e.date
+      }))
+    ];
+    setPendingEntries(pending);
+  }, [entries, allWeightEntries]);
 
   useEffect(() => {
     // Re-fetch entries when sync completes to show updated statuses
@@ -117,17 +137,18 @@ export default function Dashboard() {
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-semibold">Hi, {user?.name}</h1>
           <div className="flex items-center gap-2">
-            <span
-              className={`text-xs font-medium px-2 py-1 rounded ${
+            <button
+              onClick={() => (syncStatus === "syncing" || pendingEntries.length > 0) && setShowSyncModal(true)}
+              className={`text-xs font-medium px-2 py-1 rounded cursor-pointer ${
                 syncStatus === "synced"
                   ? "bg-green-100 text-green-700"
                   : syncStatus === "syncing"
-                  ? "bg-blue-100 text-blue-700"
+                  ? "bg-blue-100 text-blue-700 hover:bg-blue-200"
                   : "bg-orange-100 text-orange-700"
-              }`}
+              } ${(syncStatus !== "syncing" && pendingEntries.length === 0) ? "cursor-default" : ""}`}
             >
               {syncStatus === "synced" ? "✓ Synced" : syncStatus === "syncing" ? "⟳ Syncing" : "⊘ Offline"}
-            </span>
+            </button>
             <button
               onClick={logout}
               className="rounded-md border px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-100"
@@ -300,6 +321,12 @@ export default function Dashboard() {
           )}
         </div>
       </div>
+
+      <SyncModal
+        isOpen={showSyncModal}
+        onClose={() => setShowSyncModal(false)}
+        pendingEntries={pendingEntries}
+      />
     </div>
   );
 }

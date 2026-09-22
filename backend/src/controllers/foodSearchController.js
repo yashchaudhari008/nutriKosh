@@ -105,6 +105,10 @@ export async function searchFoods(req, res) {
 
       for (const food of [...offResults, ...usdaResults]) {
         if (results.length >= 10) break;
+        // Skip foods with all zero nutrition values (incomplete data)
+        if (food.protein === 0 && food.calories === 0 && food.carbs === 0 && food.fat === 0) {
+          continue;
+        }
         if (!seenIds.has(food.foodName.toLowerCase())) {
           const override = overrideMap.get(food.foodId);
 

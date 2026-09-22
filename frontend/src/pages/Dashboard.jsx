@@ -57,12 +57,20 @@ export default function Dashboard() {
     }
   }, [user?._id, token]);
 
+  function sampleEntries(ents, maxPoints = 10) {
+    if (ents.length <= maxPoints) return ents;
+    const step = Math.floor(ents.length / maxPoints);
+    return ents.filter((_, idx) => idx % step === 0 || idx === ents.length - 1);
+  }
+
   useEffect(() => {
     if (weightRange === "week") {
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
       const cutoffDate = sevenDaysAgo.toISOString().slice(0, 10);
       setWeightEntries(allWeightEntries.filter((e) => e.date >= cutoffDate));
+    } else if (weightRange === "lifetime") {
+      setWeightEntries(sampleEntries(allWeightEntries, 10));
     } else {
       setWeightEntries(allWeightEntries);
     }
@@ -152,6 +160,16 @@ export default function Dashboard() {
                   }`}
                 >
                   1M
+                </button>
+                <button
+                  onClick={() => setWeightRange("lifetime")}
+                  className={`px-2 py-0.5 text-xs rounded font-medium transition ${
+                    weightRange === "lifetime"
+                      ? "bg-slate-900 text-white"
+                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                  }`}
+                >
+                  All
                 </button>
               </div>
             </div>

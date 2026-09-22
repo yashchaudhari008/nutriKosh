@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { apiFetch } from "../lib/apiClient";
-import { todayISO } from "../lib/date";
+import { todayISO, formatDateFull } from "../lib/date";
 import { addWeightEntry, getWeightEntries } from "../lib/db";
 import { pullServerDataAndMerge } from "../lib/syncEngine";
 
@@ -95,13 +95,20 @@ export default function WeightLog() {
         <form onSubmit={handleSubmit} className="space-y-3 rounded-lg border bg-white p-4 shadow-sm">
           <div>
             <label className="block text-xs font-medium text-slate-500 mb-1">Date</label>
-            <input
-              required
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="w-full rounded-md border px-3 py-2 text-sm"
-            />
+            <div className="relative">
+              <input
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                className="w-full rounded-md border px-3 py-2 text-sm opacity-0 absolute h-10 cursor-pointer"
+              />
+              <input
+                type="text"
+                readOnly
+                value={formatDateFull(date)}
+                className="w-full rounded-md border px-3 py-2 text-sm bg-white pointer-events-none"
+              />
+            </div>
           </div>
           <div className="flex gap-2">
             <input
@@ -141,7 +148,7 @@ export default function WeightLog() {
                   <div>
                     <p className="text-sm font-medium">{entry.weight} kg</p>
                     <p className="text-xs text-slate-400">
-                      {entry.date}
+                      {formatDateFull(entry.date)}
                       {entry.note ? ` · ${entry.note}` : ""}
                     </p>
                   </div>

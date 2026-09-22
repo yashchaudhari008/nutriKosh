@@ -70,8 +70,9 @@ export default function Dashboard() {
         getFoodEntriesByDate(user?._id, today),
         getWeightEntriesByDateRange(user?._id, weekStart, today)
       ]).then(([food, weight]) => {
-        setEntries(food);
-        setAllWeightEntries(weight);
+        // Mark API entries as synced if they don't have syncStatus
+        setEntries(food.map(e => ({ ...e, syncStatus: e.syncStatus || "synced" })));
+        setAllWeightEntries(weight.map(e => ({ ...e, syncStatus: e.syncStatus || "synced" })));
       });
     }
     setLastSyncStatus(syncStatus);
